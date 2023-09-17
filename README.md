@@ -37,11 +37,11 @@ La presente entrega surge del documento [Trabajo Practico Final 2023](https://dr
 * VERSION="22.04.2 LTS (Jammy Jellyfish)"
   
 # Instalación
-1. Clonar este repositorio en tu sistema local.
-2. Asegurarse de tener instalado Bash en tu sistema.
-3. Ejecutar el script `menu.sh` en la terminal.
-4. Enlace de descarga: https://github.com/drivetuia23/tp-entorno.git
-   
+Enlace de descarga: https://github.com/drivetuia23/tp-entorno.git
+1.  Verifique que su sistema y Docker estén actualizados y disponibles.
+2.  _Puede serguir estos pasos para actualizar e instalar Docker en su máquina_ [Procedimientos Instalación y ejecución TP-ENTORNO Grupo 4](https://drive.google.com/file/d/1CxTLDZW3avIHoTGcAivecbQKgR71FugF/view?usp=sharing) El documento contiene también el procedimiento para clonar directamente y ejecutar, e info sobre el uso del sitema a través de sus pantallas.
+3.  Descargue desde este repositorio el archivo __Dockerfile__ y ejecútelo en su consola
+
 **Requisitos**
 
 Para el correcto funcionamiento, el sistema requiere de los siguientes paquetes:
@@ -52,12 +52,38 @@ Para el correcto funcionamiento, el sistema requiere de los siguientes paquetes:
 5. **figlet**: impresión de titulos en ASCII art
 
 ## Estructura del sistema
-El sistema está compuesto por los siguientes bash scripts:
+El sistema está compuesto por:
+
+![image](https://github.com/drivetuia23/tp-entorno/assets/136250619/fc1c7d8c-6bc1-4553-a618-ed8d24c21220)
+
+Dockerfile, README.md y FCEIA-logo.png corresponden a la ejecución de la imagen y la documentacion en el repo. Lo demás, son los scripts que se describen a continuación.
 
 ### 0.  menu.sh
-Este script esta compuesto por titulo y subtitulo, donde se hace necesario el paquete de **figlet** para leerlos, asi como el titulo de las opciones. La opción "0 - salir" limpia culquier opción ingresada por el usuario, presenta un titulo de salida y cierra el programa. La opción "1 - Generar imagenes"
-### 1.  generar.sh
-### 2.  descomprimir.sh
-### 3.  procesar.sh
-### 4.  comprimir.sh
+Este componente es el articulador de las funciones que permite el sistema para obtener y nombrar archivos de imágenes provenientes de una url Web, y disponerlas en un paquete comprimido para su posterior uso. A su vez, el menú permite ejecutar opciones para reducir el tamaño de las imágenes y, finalmente, empaquetar dicho output junto con estadística básica sobre los archivos procesados.
 
+El script presenta un titular, las opciones disponibles y su elección, validaciones de ingreso y una estructura de ejecución de casos con validaciones y titulares propios.
+
+### 1.  generar.sh
+Antes de entrar a este script, el menú toma el control del ingreso de la cantidad de imágenes a generar. La condición actual es número entero en el rango 1 a 90.000 (el máximo es por la cantidad de nombres aproximados disponibles). Si no se desea generar imagenes, se ingresa un cero. 
+
+Al ser llamado desde el menú, recibe un número desde y realiza estas rutinas si es que dicho valor es válido:
+- Obtiene los nombres desde un servicio web y los almacena en forma local
+- Descarga las imagenes de personas desde un servicio web de acuerdo a la cantidad de imágenes a generar indicada por el usuario, y les asigna un nobre al azar. En el ciclo va informando el estado del proceso.
+- Comprime el directorio con las imagenes generadas y chequea validez de la compresión.
+- Muestra info final y vuelve al menú
+  
+El work directory agrega un direcotrio nuevo llamado **img** con los archivos de imagen generados, y un paquete **imagenes.tar.gz** con dicha carpeta y el archivo __verificacion.txt__
+
+### 2.  descomprimir.sh
+Al llegar a este punto el script ejecuta, antes que nada, una validación para saber si se generaron efectivamente los archivos de la suma de verificación de las imagenes y el archivo comprimido, luego encontramos una validación para saber si existen ambos archivos mencionados anteriormente. Antes de descomprimir las imagenes verifica si hubo error en la suma de verificación y si no lo hay procede a descomprimir las imagenes sobre el directorio **img**.
+
+### 3.  procesar.sh
+Al recibir las imagenes ya descomprimidas las procesa primero por nombre para que tengan solamente nombres válidos, es decir, que la primera letra sea __mayuscúla__, luego se crea un directório **procesadas** para guardar las imagenes que pasaron por una modificación en su tamaño utilizando la linea de "convert y resize" que esta en el enunciado de este trabajo práctico. Las imagenes con nombres no válidos son descartadas y en el directorio quedarán solamente las que fueron de hecho procesadas. 
+Luego de todo el proceso mostrará la información final y vuelve al menú.
+
+### 4.  comprimir.sh
+Antes de comprimir las imagenes procesadas anteriormente hay una validación para saber si el directorio img y procesadas existen, de ser asi procede a crear el directorio de salida que se llama  **generados* si no existe. Al tener todos los directorios generará tres listas .txt:
+- __lista_nombres_imagenes.txt__ con los nombres de las imagenes;
+- __lista_nombres_validos.txt__ con los nombres válidos procesados en el paso anterior y;
+- __total_nombres_con_a.txt__ con la cantidad de nombres que terminen con a, también modificamos el ´grep´ para que lea hasta la coma dentro del nombre del archivo (nombre, numero).
+Las tres listas con las imagenes son comprimidas en un archivo .tar.gz con el nombre **archivos_generados.tar.gz**, aparecerá la información con los archivos que fueron creados y volverá al menú. 
